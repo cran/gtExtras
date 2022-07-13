@@ -10,6 +10,9 @@ coverage](https://codecov.io/gh/jthomasmock/gtExtras/branch/master/graph/badge.s
 [![R-CMD-check](https://github.com/jthomasmock/gtExtras/workflows/R-CMD-check/badge.svg)](https://github.com/jthomasmock/gtExtras/actions)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/gtExtras)](https://CRAN.R-project.org/package=gtExtras)
+[![R-CMD-check](https://github.com/jthomasmock/gtExtras/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jthomasmock/gtExtras/actions/workflows/R-CMD-check.yaml)
+![gtExtras Total
+Downloads](https://cranlogs.r-pkg.org/badges/grand-total/gtExtras)
 <!-- badges: end -->
 
 The goal of `{gtExtras}` is to provide some additional helper functions
@@ -37,62 +40,36 @@ can install the development version of gtExtras from
 remotes::install_github("jthomasmock/gtExtras")
 ```
 
-You can install
+There are four families of functions in `gtExtras`:
 
-### `fmt_symbol_first`
+-   Themes: 7 themes that style almost every element of a `gt` table,
+    built off of data journalism-styled tables
+-   Utilities: Helper functions for aligning/padding numbers, adding
+    `fontawesome` icons, images, highlighting, dividers, styling by
+    group, creating two tables or two column layouts, extracting ordered
+    data from a `gt` table internals, or generating a random dataset for
+    `reprex`
+-   Plotting: 12 plotting functions for inline sparklines, win-loss
+    charts, distributions (density/histogram), percentiles, dot + bar,
+    bar charts, confidence intervals, or summarizing an entire
+    dataframe!
+-   Colors: 3 functions, a palette for “Hulk” style scale
+    (purple/green), coloring rows with good defaults, or adding a “color
+    box” along with the cell value
 
-This function allows you to format your columns only on the first row,
-where remaining rows in that column have whitespace added to the end to
-maintain proper alignment.
+Also see the [Plotting with `gtExtras`
+article](https://jthomasmock.github.io/gtExtras/articles/plotting-with-gtExtras.html)
+for more examples of combining tables and graphics together.
 
-``` r
-library(gtExtras)
-library(gt)
-
-gtcars %>%
-  head() %>%
-  dplyr::select(mfr, year, bdy_style, mpg_h, hp) %>%
-  dplyr::mutate(mpg_h = rnorm(n = dplyr::n(), mean = 22, sd = 1)) %>%
-  gt::gt() %>%
-  gt::opt_table_lines() %>%
-  fmt_symbol_first(column = mfr, symbol = "&#x24;", last_row_n = 6) %>%
-  fmt_symbol_first(column = year, suffix = "%") %>%
-  fmt_symbol_first(column = mpg_h, symbol = "&#37;", decimals = 1) %>%
-  fmt_symbol_first(hp, symbol = "&#176;", suffix = "F", symbol_first = TRUE)
-```
-
-<p align="center">
-<img src="man/figures/gt_fmt_first.png" width="700px">
-</p>
-
-### `pad_fn`
-
-You can use `pad_fn()` with `gt::fmt()` to pad specific columns that
-contain numeric values. You will use it when you want to “decimal align”
-the values in the column, but not require printing extra trailing
-zeroes.
-
-``` r
-data.frame(x = c(1.2345, 12.345, 123.45, 1234.5, 12345)) %>%
-  gt() %>%
-  fmt(fns = function(x){pad_fn(x, nsmall = 4)}) %>%
-  tab_style(
-    # MUST USE A MONO-SPACED FONT
-    style = cell_text(font = google_font("Fira Mono")),
-    locations = cells_body(columns = x)
-    )
-```
-
-<p align="center">
-<img src="man/figures/gt_pad_fn.png" width="200px">
-</p>
+A subset of functions are included below, or see the full [function
+reference](https://jthomasmock.github.io/gtExtras/reference/index.html).
 
 ### Themes
 
-The package includes three different themes, the `gt_theme_538()` styled
-after FiveThirtyEight style tables, the `gt_theme_espn()` styled after
-ESPN style tables, and the `gt_theme_nytimes()` styled after The New
-York Times tables.
+The package includes seven different themes, and 3 examples are the
+`gt_theme_538()` styled after FiveThirtyEight style tables, the
+`gt_theme_espn()` styled after ESPN style tables, and the
+`gt_theme_nytimes()` styled after The New York Times tables.
 
 ``` r
 head(mtcars) %>%
@@ -213,17 +190,15 @@ mtcars %>%
 <img src="man/figures/blue-pal.png" width="700px">
 </p>
 
-You can also use custom-defined palettes if you wish with
-`use_paletteer = FALSE`.
+You can also use custom-defined palettes with named colors in R or hex
+color values.
 
 ``` r
 mtcars %>%
   head() %>%
   gt() %>%
-  gt_color_rows(
-    mpg:disp, palette = c("white", "green"),
+  gt_color_rows(mpg:disp, palette = c("white", "green"))
     # could also use palette = c("#ffffff", "##00FF00")
-    use_paletteer = FALSE)
 ```
 
 <p align="center">
@@ -238,10 +213,11 @@ mtcars %>%
   head() %>%
   gt() %>%
   gt_color_rows(
-    cyl, type = "discrete",
+    cyl, 
     palette = "ggthemes::colorblind", 
     # note that you can manually define range like c(4, 6, 8)
-    domain = range(mtcars$cyl)
+    domain = range(mtcars$cyl),
+    pal_type = "discrete"
    )
 ```
 
@@ -288,12 +264,12 @@ head(mtcars[,1:5]) %>%
 ### `gt_sparkline()`
 
 ``` r
-gt_sparkline_tab <- mtcars %>%
+mtcars %>%
    dplyr::group_by(cyl) %>%
    # must end up with list of data for each row in the input dataframe
    dplyr::summarize(mpg_data = list(mpg), .groups = "drop") %>%
    gt() %>%
-   gt_sparkline(mpg_data)
+   gt_plt_sparkline(mpg_data)
 ```
 
 <p align="center">
@@ -421,8 +397,7 @@ the data.
 create_input_df(4) %>% 
   gt() %>% 
   gt_plt_winloss(outcomes, max_wins = 15) %>% 
-  tab_options(data_row.padding = px(2))  %>% 
-  gtsave("man/figures/wl-4.png")
+  tab_options(data_row.padding = px(2))
 ```
 
 <p align="center">
@@ -447,6 +422,7 @@ A more realistic use case is seen below with data from `{nflreadr}`:
 
 ``` r
 library(dplyr)
+library(tidyr)
 library(nflreadr)
 
 games_df <- nflreadr::load_schedules() %>% 
@@ -496,4 +472,52 @@ final_df %>%
 
 <p align="center">
 <img src="man/figures/nfl-outcomes.png" width="500px">
+</p>
+
+### `fmt_symbol_first`
+
+This function allows you to format your columns only on the first row,
+where remaining rows in that column have whitespace added to the end to
+maintain proper alignment.
+
+``` r
+library(gtExtras)
+library(gt)
+
+gtcars %>%
+  head() %>%
+  dplyr::select(mfr, year, bdy_style, mpg_h, hp) %>%
+  dplyr::mutate(mpg_h = rnorm(n = dplyr::n(), mean = 22, sd = 1)) %>%
+  gt::gt() %>%
+  gt::opt_table_lines() %>%
+  fmt_symbol_first(column = mfr, symbol = "&#x24;", last_row_n = 6) %>%
+  fmt_symbol_first(column = year, suffix = "%") %>%
+  fmt_symbol_first(column = mpg_h, symbol = "&#37;", decimals = 1) %>%
+  fmt_symbol_first(hp, symbol = "&#176;", suffix = "F", symbol_first = TRUE)
+```
+
+<p align="center">
+<img src="man/figures/gt_fmt_first.png" width="700px">
+</p>
+
+### `pad_fn`
+
+You can use `pad_fn()` with `gt::fmt()` to pad specific columns that
+contain numeric values. You will use it when you want to “decimal align”
+the values in the column, but not require printing extra trailing
+zeroes.
+
+``` r
+data.frame(x = c(1.2345, 12.345, 123.45, 1234.5, 12345)) %>%
+  gt() %>%
+  fmt(fns = function(x){pad_fn(x, nsmall = 4)}) %>%
+  tab_style(
+    # MUST USE A MONO-SPACED FONT
+    style = cell_text(font = google_font("Fira Mono")),
+    locations = cells_body(columns = x)
+    )
+```
+
+<p align="center">
+<img src="man/figures/gt_pad_fn.png" width="200px">
 </p>

@@ -10,7 +10,8 @@ gt_color_box(
   palette = NULL,
   ...,
   domain = NULL,
-  width = 70
+  width = 70,
+  font_weight = "bold"
 )
 }
 \arguments{
@@ -18,13 +19,15 @@ gt_color_box(
 
 \item{columns}{The columns wherein changes to cell data colors should occur.}
 
-\item{palette}{The colours or colour function that values will be mapped to. Can be a character vector (eg \code{c("white", "red")} or hex colors) or if \code{use_paletteer = TRUE}, a named palette from the \code{{paletteer}} package.}
+\item{palette}{The colours or colour function that values will be mapped to. Can be a character vector (eg \code{c("white", "red")} or hex colors) or a named palette from the \code{{paletteer}} package in the \code{package::palette_name} structure. Note that \code{'pff'} will fill in a blue -> green -> yellow -> orange -> red palette.}
 
 \item{...}{Additional arguments passed to \code{scales::label_number()}, primarily used to format the numbers inside the color box}
 
 \item{domain}{The possible values that can be mapped. This should be a simple numeric range (e.g. \code{c(0, 100)})}
 
 \item{width}{The width of the entire coloring area in pixels.}
+
+\item{font_weight}{A string indicating the font weight, defaults to \code{"bold"}, change to \code{"normal"} for default weight.}
 }
 \value{
 An object of class \code{gt_tbl}.
@@ -35,6 +38,21 @@ Note that rather than using \code{gt::fmt_} functions on this column, you can se
 numeric formatting arguments via \code{...}. All arguments should be named
 and are passed to \code{scales::label_number()}.
 }
+\section{Examples}{
+
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{library(gt)
+test_data <- dplyr::tibble(x = letters[1:10],
+                    y = seq(100, 10, by = -10),
+                    z = seq(10, 100, by = 10))
+color_box_tab <- test_data \%>\%
+  gt() \%>\%
+  gt_color_box(columns = y, domain = 0:100, palette = "ggsci::blue_material") \%>\%
+  gt_color_box(columns = z, domain = 0:100,
+               palette = c("purple", "lightgrey", "green"))
+}\if{html}{\out{</div>}}
+}
+
 \section{Figures}{
 
 \if{html}{\figure{color_box.png}{options: width=30\%}}
@@ -45,17 +63,6 @@ and are passed to \code{scales::label_number()}.
 4-3
 }
 
-\examples{
-library(gt)
-test_data <- dplyr::tibble(x = letters[1:10],
-                    y = seq(100, 10, by = -10),
-                    z = seq(10, 100, by = 10))
-color_box_tab <- test_data \%>\%
-  gt() \%>\%
-  gt_color_box(columns = y, domain = 0:100, palette = "ggsci::blue_material") \%>\%
-  gt_color_box(columns = z, domain = 0:100,
-               palette = c("purple", "lightgrey", "green"))
-}
 \seealso{
 Other Colors: 
 \code{\link{gt_color_rows}()},

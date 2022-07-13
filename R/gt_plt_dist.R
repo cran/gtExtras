@@ -16,7 +16,8 @@
 #' @param same_limit A logical indicating that the plots will use the same axis range (`TRUE`) or have individual axis ranges (`FALSE`).
 #' @return An object of class `gt_tbl`.
 #' @export
-#' @examples
+#' @section Examples:
+#' ```r
 #'  library(gt)
 #'  gt_sparkline_tab <- mtcars %>%
 #'     dplyr::group_by(cyl) %>%
@@ -24,9 +25,9 @@
 #'     dplyr::summarize(mpg_data = list(mpg), .groups = "drop") %>%
 #'     gt() %>%
 #'     gt_plt_dist(mpg_data)
-#'
+#' ```
 #' @section Figures:
-#' \if{html}{\figure{ggplot2-sparkline.png}{options: width=50\%}}
+#' \if{html}{\figure{gt_plt_dist.png}{options: width=50\%}}
 #'
 #' @family Plotting
 #' @section Function ID:
@@ -37,7 +38,7 @@ gt_plt_dist <- function(gt_object, column, type = "density", fig_dim = c(5,30),
   same_limit = TRUE
 ) {
 
-  stopifnot("'gt_object' must be a 'gt_tbl', have you accidentally passed raw data?" = "gt_tbl" %in% class(gt_object))
+  is_gt_stop(gt_object)
   # convert tidyeval column to bare string
   col_bare <- dplyr::select(gt_object[["_data"]], {{ column }}) %>% names()
 
@@ -47,7 +48,7 @@ gt_plt_dist <- function(gt_object, column, type = "density", fig_dim = c(5,30),
   # convert to a single vector
   data_in <- unlist(list_data_in)
 
-  stopifnot("Specified column must contain list of values" = class(list_data_in) %in% "list")
+  stopifnot("Specified column must contain list of values" = any(class(list_data_in) %in% "list"))
   stopifnot("Specified column must be numeric" = is.numeric(data_in))
   stopifnot("You must indicate the `type` of plot as one of 'boxplot', 'histogram', 'rug_strip' or 'density'." = isTRUE(type %in% c("boxplot", "rug_strip", "histogram", "density")))
 
@@ -270,12 +271,13 @@ gt_plt_dist <- function(gt_object, column, type = "density", fig_dim = c(5,30),
     on.exit(file.remove(out_name), add=TRUE)
 
     img_plot
+
   }
 
   text_transform(
   gt_object,
   locations = cells_body(columns = {{ column }}),
-  fn = function(x) {mapply(plot_fn_spark, trim, list_data_in)}
+  fn = function(x) {mapply(plot_fn_spark, trim, list_data_in, SIMPLIFY = FALSE)}
 )
 }
 

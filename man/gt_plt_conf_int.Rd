@@ -41,19 +41,10 @@ a gt table
 \description{
 Plot a confidence interval around a point
 }
-\section{Figures}{
+\section{Examples}{
 
-\if{html}{\figure{gt_plt_ci_calc.png}{options: width=70\%}}
-\if{html}{\figure{gt_plt_ci_vals.png}{options: width=70\%}}
-}
 
-\section{Function ID}{
-
-3-10
-}
-
-\examples{
-# gtExtras can calculate basic conf int
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{# gtExtras can calculate basic conf int
 # using confint() function
 
 ci_table <- generate_df(
@@ -81,8 +72,21 @@ pre_calc_ci_tab <- dplyr::tibble(
   gt_plt_conf_int(
     ci_plot, c(ci1, ci2),
     palette = c("red", "lightgrey", "black", "red")
-  )
+    )
+}\if{html}{\out{</div>}}
 }
+
+\section{Figures}{
+
+\if{html}{\figure{gt_plt_ci_calc.png}{options: width=70\%}}
+\if{html}{\figure{gt_plt_ci_vals.png}{options: width=70\%}}
+}
+
+\section{Function ID}{
+
+3-10
+}
+
 \seealso{
 Other Themes: 
 \code{\link{gt_plt_bullet}()},
@@ -93,6 +97,7 @@ Other Themes:
 \code{\link{gt_theme_espn}()},
 \code{\link{gt_theme_excel}()},
 \code{\link{gt_theme_guardian}()},
-\code{\link{gt_theme_nytimes}()}
+\code{\link{gt_theme_nytimes}()},
+\code{\link{gt_theme_pff}()}
 }
 \concept{Themes}

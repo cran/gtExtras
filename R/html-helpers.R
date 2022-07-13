@@ -1,13 +1,14 @@
 #' Add a simple table with column names and matching labels
 #'
 #' @param label A string representing the label for the details expansion section.
-#' @param content A named list
-#'
+#' @param content A named list or wide data.frame with 2 rows
+#' @param names a string indicating the name of the two columns inside the details tag
 #' @return HTML text
 #' @export
-gt_label_details <- function(label, content){
+gt_label_details <- function(label, content, names = c("Column", "Description")){
 
   stopifnot("Must be a named list" = length(names(content)) >= 1)
+  stopifnot("'names' must be length 2" = length(names) == 2)
 
   build_content <- function(lab_item, content_item){
     glue::glue(
@@ -23,7 +24,7 @@ gt_label_details <- function(label, content){
     paste0(collapse = "")
 
   c(glue::glue("<details><summary>{label}</summary>"),
-    "<br><table><tr><th>Column</th><th>Description</th>",
+    glue::glue("<br><table><tr><th>{names[1]}</th><th>{names[2]}</th>"),
     fill_content,
     "</table></details>") %>% paste0(collapse = "") %>%
     as.character() %>%
@@ -93,12 +94,14 @@ add_badge_color <- function(add_color, add_label, alpha_lvl){
 #' @param alpha A numeric indicating the alpha/transparency. Range from 0 to 1
 #' @export
 #' @return `gt` table
-#' @examples
+#' @section Examples:
+#' ```r
 #' library(gt)
-#' badge_tab <- head(mtcars) %>%
+#' head(mtcars) %>%
 #'   dplyr::mutate(cyl = paste(cyl, "Cyl")) %>%
 #'   gt() %>%
 #'   gt_badge(cyl, palette = c("4 Cyl"="red","6 Cyl"="blue","8 Cyl"="green"))
+#' ```
 #' @section Figures:
 #' \if{html}{\figure{gt_badge.png}{options: width=50\%}}
 #'

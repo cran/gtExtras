@@ -1,6 +1,6 @@
 test_that("img_header generates img", {
   check_suggests()
-
+  skip_on_cran()
   example_img <- img_header(
     "Luka Doncic",
     "https://secure.espn.com/combiner/i?img=/i/headshots/nba/players/full/3945274.png",
@@ -25,6 +25,5 @@ test_that("img_header generates img", {
   act_div <- c("style" = "font-size:10px;color: black;text-align: center;width:100%;font-weight:bold;")
 
   expect_equal(exp_div, act_div)
-
 
 })

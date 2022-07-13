@@ -1,14 +1,34 @@
+# gtExtras 0.4.1
+
+- Add explicit height argument to `gt_fa_column()`
+- Add `get_row_index()` to assist in applying styles to specific rows visually
+- Refactor `last_row_id()` to use `get_row_index()` internally.
+- Refactor `gt_index()` to respect multiple groups - closes [Issue #58](https://github.com/jthomasmock/gtExtras/issues/58) - thanks @jmbarbone !
+- Refactor `tab_style_by_grp()` to respect multiple groups
+- Add NA handling to `gt_plt_conf_int()` - closes [#52](https://github.com/jthomasmock/gtExtras/issues/52)
+- Update readme content to reflect latest documentation
+- Remove `use_paletteer` argument from documentation (inline operation in function)
+- Convert `&nbsp` to `&nbsp;` in `fmt_symbol_first()` and `fmt_pad_num()`, convert tests to match
+- Update documentation for `gt_img_circle()`
+- Add `gt_theme_pff()` for Pro Football Focus style tables
+- Add a `"pff"` palette option to `gt_color_box()`
+- Add new arguments to `gt_merge_stack()`  per [issue 53](https://github.com/jthomasmock/gtExtras/issues/53)
+- Bulk update of examples sections and updated images
+- Remove background color from label in `gt_plt_conf_int()` - closes [#54](https://github.com/jthomasmock/gtExtras/issues/54)
+- Add `gt_index()` to internals of `gt_merge_stack()` to prevent incorrect arrangement when grouping data - closes [issue #55](https://github.com/jthomasmock/gtExtras/issues/55)
+- Corrected `gt_plt_sparkline()` where in some cases inline plots weren't respecting shared limits.
+
 # gtExtras 0.4.0
 
-- Prep for and submit initial CRAN release :fingers-crossed:.
+- Prep for and submit initial CRAN release :fingers-crossed:
 
 # gtExtras 0.3.9
-- Renamed colors arg in `merge_and_stack()` to be 'palette'
+- Renamed colors arg in `gt_merge_stack()` to be 'palette'
 - Renamed colors arg in `gt_plt_bullet()` to be 'palette'
 - Renamed pal arg in `gt_plt_sparkline()` to be 'palette'
 
 # gtExtras 0.3.8
-- Renamed `colors` argument in `gt_win_loss() to `palette`
+- Renamed `colors` argument in `gt_win_loss()` to `palette`
 - Added NA handling to all `fontawesome::fa()` functions, ie `gt_fa_rank_change()`, `gt_fa_repeats()`, `gt_fa_column()`
 - Add missing data handling to more plotting functions
 - Refactor testing to use `webshot2::webshot()` over `webshot::webshot()`
