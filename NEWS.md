@@ -1,3 +1,10 @@
+# gtExtras 0.4.2
+
+- Rebuild docs with latest `roxygen2` to fix HTML documentation issues on CRAN
+- Add `gt_img_multi_rows()` courtesy of Ryan Timpe per [#63](https://github.com/jthomasmock/gtExtras/pull/63)
+- Add "alt" argument to `man_get_image_tag()` helper - solves CRAN HTML issues for missing alt-text
+- Use alt-text on `gt_plt_summary()` and `gt_plt_winloss()`
+
 # gtExtras 0.4.1
 
 - Add explicit height argument to `gt_fa_column()`
