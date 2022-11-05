@@ -11,6 +11,7 @@ gt_highlight_rows(
   fill = "#80bcd8",
   alpha = 0.8,
   font_weight = "bold",
+  font_color = "#000000",
   bold_target_only = FALSE,
   target_col = c()
 )
@@ -27,6 +28,8 @@ gt_highlight_rows(
 \item{alpha}{An optional alpha transparency value for the color as single value in the range of 0 (fully transparent) to 1 (fully opaque). If not provided the fill color will either be fully opaque or use alpha information from the color value if it is supplied in the #RRGGBBAA format.}
 
 \item{font_weight}{A string or number indicating the weight of the font. Can be a text-based keyword such as "normal", "bold", "lighter", "bolder", or, a numeric value between 1 and 1000, inclusive. Note that only variable fonts may support the numeric mapping of weight.}
+
+\item{font_color}{A character string indicating the text color. If nothing is provided, then "#000000" (black) will be used as a default.}
 
 \item{bold_target_only}{A logical of TRUE/FALSE indicating whether to apply bold to only the specific \code{target_col}. You must indicate a specific column with \code{target_col}.}
 
@@ -89,10 +92,12 @@ Other Utilities:
 \code{\link{gt_fa_rating}()},
 \code{\link{gt_fa_repeats}()},
 \code{\link{gt_highlight_cols}()},
+\code{\link{gt_img_border}()},
 \code{\link{gt_img_circle}()},
 \code{\link{gt_img_multi_rows}()},
 \code{\link{gt_img_rows}()},
 \code{\link{gt_index}()},
+\code{\link{gt_merge_stack_color}()},
 \code{\link{gt_merge_stack}()},
 \code{\link{gt_two_column_layout}()},
 \code{\link{gtsave_extra}()},
