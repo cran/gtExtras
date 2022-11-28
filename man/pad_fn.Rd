@@ -4,12 +4,14 @@
 \alias{pad_fn}
 \title{Pad a vector of numbers to align on the decimal point.}
 \usage{
-pad_fn(x, nsmall = 2)
+pad_fn(x, nsmall = 2, pad0)
 }
 \arguments{
 \item{x}{A vector of numbers to pad/align at the decimal point}
 
 \item{nsmall}{The max number of decimal places to round at/display}
+
+\item{pad0}{A logical, indicating whether to pad the values with trailing zeros.}
 }
 \value{
 Returns a vector of equal length to the input vector
@@ -34,13 +36,15 @@ This function is intended to use within the \code{gt::fmt()} function.
 library(gt)
 padded_tab <- data.frame(x = c(1.2345, 12.345, 123.45, 1234.5, 12345)) \%>\%
   gt() \%>\%
-  fmt(fns = function(x){pad_fn(x, nsmall = 4)}) \%>\%
+  fmt(fns = function(x) {
+    pad_fn(x, nsmall = 4)
+  }) \%>\%
   tab_style(
     # MUST USE A MONO-SPACED FONT
     # https://fonts.google.com/?category=Monospace
     style = cell_text(font = google_font("Fira Mono")),
     locations = cells_body(columns = x)
-    )
+  )
 
 }
 \seealso{

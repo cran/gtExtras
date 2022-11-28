@@ -29,11 +29,22 @@
 #' @section Function ID:
 #' 3-4
 
-gt_plt_bar <- function(gt_object, column = NULL, color = "purple", ...,
-                       keep_column = FALSE, width = 70, scale_type = "none",
+gt_plt_bar <- function(gt_object,
+                       column = NULL,
+                       color = "purple",
+                       ...,
+                       keep_column = FALSE,
+                       width = 70,
+                       scale_type = "none",
                        text_color = "white") {
-  stopifnot("'gt_object' must be a 'gt_tbl', have you accidentally passed raw data?" = "gt_tbl" %in% class(gt_object))
-  stopifnot("`scale_type` must be one of 'number', 'percent' or 'none'" = scale_type %in% c("number", "percent", "none"))
+  stopifnot(
+    "'gt_object' must be a 'gt_tbl',
+            have you accidentally passed raw data?" = "gt_tbl" %in% class(gt_object)
+  )
+  stopifnot(
+    "`scale_type` must be one of 'number', 'percent' or 'none'" =
+      scale_type %in% c("number", "percent", "none")
+  )
 
   var_sym <- rlang::enquo(column)
   var_bare <- rlang::as_label(var_sym)
@@ -90,14 +101,21 @@ gt_plt_bar <- function(gt_object, column = NULL, color = "purple", ...,
     )
 
     plot_out <- df_in %>%
-      ggplot(aes(x = .data$x, y = factor(.data$y), fill = I(.data$fill), group = .data$y)) +
+      ggplot(
+        aes(
+          x = .data$x,
+          y = factor(.data$y),
+          fill = I(.data$fill),
+          group = .data$y
+        )
+      ) +
       geom_col(color = "transparent", width = 0.3) +
       scale_x_continuous(
         limits = total_rng,
         expand = expansion(mult = c(0.05, 0.08)),
       ) +
       scale_y_discrete(expand = expansion(mult = c(0.2, 0.2))) +
-      geom_vline(xintercept = 0, color = "black", size = 1) +
+      geom_vline(xintercept = 0, color = "black", linewidth = 1) +
       coord_cartesian(clip = "off") +
       theme_void() +
       theme(legend.position = "none", plot.margin = unit(rep(0, 4), "pt"))
@@ -114,7 +132,8 @@ gt_plt_bar <- function(gt_object, column = NULL, color = "purple", ...,
             },
             hjust = ifelse(.data$x >= 0, 1, 0)
           ),
-          nudge_x = sign(df_in$x) * (-1) / 80, vjust = 0.5,
+          nudge_x = sign(df_in$x) * (-1) / 80,
+          vjust = 0.5,
           size = 3,
           family = "mono",
           color = text_color,
@@ -128,9 +147,13 @@ gt_plt_bar <- function(gt_object, column = NULL, color = "purple", ...,
       fileext = ".svg"
     ))
 
-    ggsave(out_name,
-      plot = plot_out, dpi = 25.4,
-      height = 5, width = width, units = "mm",
+    ggsave(
+      out_name,
+      plot = plot_out,
+      dpi = 25.4,
+      height = 5,
+      width = width,
+      units = "mm",
       device = "svg"
     )
 
@@ -138,7 +161,7 @@ gt_plt_bar <- function(gt_object, column = NULL, color = "purple", ...,
       paste0(collapse = "") %>%
       gt::html()
 
-    on.exit(file.remove(out_name), add=TRUE)
+    on.exit(file.remove(out_name), add = TRUE)
 
     img_plot
   }
@@ -147,7 +170,7 @@ gt_plt_bar <- function(gt_object, column = NULL, color = "purple", ...,
   tab_out <- text_transform(
     gt_object,
     locations = if (isTRUE(keep_column)) {
-      cells_body(columns = .data$DUPE_COLUMN_PLT)
+      cells_body(columns = c(DUPE_COLUMN_PLT))
     } else {
       cells_body(columns = {{ column }})
     },
@@ -159,7 +182,7 @@ gt_plt_bar <- function(gt_object, column = NULL, color = "purple", ...,
   if (isTRUE(keep_column)) {
     tab_out %>%
       cols_label(DUPE_COLUMN_PLT = col_bare) %>%
-      cols_align("left", columns = .data$DUPE_COLUMN_PLT)
+      cols_align("left", columns = c(DUPE_COLUMN_PLT))
   } else {
     tab_out %>%
       cols_align("left", columns = {{ column }})
