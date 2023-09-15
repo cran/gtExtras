@@ -2,7 +2,8 @@
 #' @description
 #' The `gt_plt_bar` function takes an existing `gt_tbl` object and
 #' adds horizontal barplots via `ggplot2`. Note that values are plotted on a
-#' shared x-axis, and a vertical black bar is added at x = zero.
+#' shared x-axis, and a vertical black bar is added at x = zero. To add labels
+#' to each of the of the bars, set `scale_type` to either `'percent'` or `'number`'.
 #'
 #' @param gt_object An existing gt table object of class `gt_tbl`
 #' @param column A single column wherein the bar plot should replace existing data.
@@ -34,7 +35,7 @@ gt_plt_bar <- function(gt_object,
                        color = "purple",
                        ...,
                        keep_column = FALSE,
-                       width = 70,
+                       width = 40,
                        scale_type = "none",
                        text_color = "white") {
   stopifnot(
@@ -54,7 +55,7 @@ gt_plt_bar <- function(gt_object,
     unlist()
 
   # need to handle truly empty cols
-  if (length(all_vals) == 0) {
+  if (length(na.omit(all_vals)) == 0) {
     return(gt_object)
   }
 
@@ -74,6 +75,11 @@ gt_plt_bar <- function(gt_object,
   if ((min(all_vals, na.rm = TRUE) >= 0)) {
     min_val <- 0
     rng_multiplier <- c(0.98, 1.02)
+  } else if (
+    (max(all_vals, na.rm = TRUE) < 0 & min(all_vals, na.rm = TRUE) < 0)
+    ) {
+    min_val <- min(all_vals, na.rm = TRUE)
+    rng_multiplier <- c(1.02, 0)
   } else {
     min_val <- min(all_vals, na.rm = TRUE)
     rng_multiplier <- c(1.02, 1.02)
@@ -87,7 +93,7 @@ gt_plt_bar <- function(gt_object,
   }
 
   bar_fx <- function(x_val, colors) {
-    if (x_val %in% c("NA", "NULL")) {
+    if (x_val %in% c("NA", "NULL", NA)) {
       return("<div></div>")
     }
 
@@ -109,13 +115,13 @@ gt_plt_bar <- function(gt_object,
           group = .data$y
         )
       ) +
-      geom_col(color = "transparent", width = 0.3) +
+      geom_col(color = "transparent", width = 0.35) +
       scale_x_continuous(
         limits = total_rng,
         expand = expansion(mult = c(0.05, 0.08)),
       ) +
       scale_y_discrete(expand = expansion(mult = c(0.2, 0.2))) +
-      geom_vline(xintercept = 0, color = "black", linewidth = 1) +
+      geom_vline(xintercept = 0, color = "black", linewidth = 0.5) +
       coord_cartesian(clip = "off") +
       theme_void() +
       theme(legend.position = "none", plot.margin = unit(rep(0, 4), "pt"))
@@ -130,12 +136,10 @@ gt_plt_bar <- function(gt_object,
             } else if (scale_type == "percent") {
               scales::label_percent(...)(.data$x)
             },
-            hjust = ifelse(.data$x >= 0, 1, 0)
+            hjust = ifelse(.data$x >= 0, 1.2, -.2)
           ),
-          nudge_x = sign(df_in$x) * (-1) / 80,
           vjust = 0.5,
           size = 3,
-          family = "mono",
           color = text_color,
           fontface = "bold"
         )

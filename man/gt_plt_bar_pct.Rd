@@ -8,9 +8,15 @@ gt_plt_bar_pct(
   gt_object,
   column,
   height = 16,
+  width = 100,
   fill = "purple",
   background = "#e1e1e1",
-  scaled = FALSE
+  scaled = FALSE,
+  labels = FALSE,
+  label_cutoff = 0.4,
+  decimals = 1,
+  font_style = "bold",
+  font_size = "10px"
 )
 }
 \arguments{
@@ -20,19 +26,30 @@ gt_plt_bar_pct(
 
 \item{height}{A number representing the vertical height of the plot in pixels. Defaults to 16 px.}
 
+\item{width}{A number representing the horizontal width of the plot in pixels. Defaults to 100 px. Importantly, this interacts with the label_cutoff argument, so if you want to change the cutoff, you may need to adjust the width as well.}
+
 \item{fill}{A character representing the fill for the bar, defaults to purple. Accepts a named color (eg 'purple') or a hex color.}
 
 \item{background}{A character representing the background filling out the 100\% mark of the bar, defaults to light grey. Accepts a named color (eg 'white') or a hex color.}
 
 \item{scaled}{\code{TRUE}/\code{FALSE} logical indicating if the value is already scaled to a percent of max (\code{TRUE}) or if it needs to be scaled (\code{FALSE}). Defaults to \code{FALSE}, meaning the value will be divided by the max value in that column and then multiplied by 100.}
+
+\item{labels}{\code{TRUE}/\code{FALSE} logical representing if labels should be plotted. Defaults to \code{FALSE}, meaning that no value labels will be plotted.}
+
+\item{label_cutoff}{A number, 0 to 1, representing where to set the inside/outside label boundary. Defaults to 0.40 (40\%) of the column's maximum value. If the value in that row is less than the cutoff, the label will be placed outside the bar, otherwise it will be placed within the bar. This interacts with the overall width of the bar, so if you are not happy with the placement of the labels you may try adjusting the \code{width} argument as well.}
+
+\item{decimals}{A number representing how many decimal places to be used in label rounding. Defaults to 1.}
+
+\item{font_style}{A character representing the font style of the labels. Accepts one of 'bold' (default), 'italic', or 'normal'.}
+
+\item{font_size}{A character representing the font size of the labels. Defaults to '10px'.}
 }
 \value{
 An object of class \code{gt_tbl}.
 }
 \description{
 The \code{gt_plt_bar_pct} function takes an existing \code{gt_tbl} object and
-adds horizontal barplots via native HTML. This is a wrapper around raw HTML
-strings, \code{gt::text_transform()} and \code{gt::cols_align()}. Note that values
+adds horizontal barplots via native HTML. Note that values
 default to being normalized to the percent of the maximum observed value
 in the specified column. You can turn this off if the values already
 represent a percentage value representing 0-100.
@@ -41,19 +58,25 @@ represent a percentage value representing 0-100.
 
 
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{library(gt)
- gt_bar_plot_tab <- mtcars \%>\%
-   head() \%>\%
-   dplyr::select(cyl, mpg) \%>\%
-   dplyr::mutate(mpg_pct_max = round(mpg/max(mpg) * 100, digits = 2),
-                 mpg_scaled = mpg/max(mpg) * 100) \%>\%
-   dplyr::mutate(mpg_unscaled = mpg) \%>\%
-   gt() \%>\%
-   gt_plt_bar_pct(column = mpg_scaled, scaled = TRUE) \%>\%
-   gt_plt_bar_pct(column = mpg_unscaled, scaled = FALSE,
-                  fill = "blue", background = "lightblue") \%>\%
-   cols_align("center", contains("scale")) \%>\%
-   cols_width(4 ~ px(125),
-              5 ~ px(125))
+
+base_tab <- dplyr::tibble(x = seq(1, 100, length.out = 6)) \%>\%
+  dplyr::mutate(
+    x_unscaled = x,
+    x_scaled = x / max(x) * 100
+  ) \%>\%
+  gt()
+
+base_tab \%>\%
+  gt_plt_bar_pct(
+    column = x_unscaled,
+    scaled = TRUE,
+    fill = "forestgreen"
+  ) \%>\%
+  gt_plt_bar_pct(
+    column = x_scaled,
+    scaled = FALSE,
+    labels = TRUE
+  )
 }\if{html}{\out{</div>}}
 }
 

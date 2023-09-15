@@ -127,6 +127,7 @@ gt_fa_column <- function(gt_object, column, ..., palette = NULL,
     gt_object,
     locations = cells_body(columns = {{ column }}),
     fn = function(x) {
+
       if (is.null(palette)) {
         # if no palette use categorical colorblind palette
         pal_filler <- c(
@@ -137,9 +138,10 @@ gt_fa_column <- function(gt_object, column, ..., palette = NULL,
       } else if (length(palette) == 1) {
         pal_filler <- palette %>% rep(length(unique(x)))
       } else if (all(unique(x) %in% names(palette))) {
+        pal_no_missing <- x[!x %in% c("", "NA", NA, "NULL", NULL)]
         # palette is superset of values,
         # so reduce palette to just what's needed
-        pal_filler <- palette[unique(x)]
+        pal_filler <- palette[unique(pal_no_missing)]
       } else {
         # palette is the palette
         pal_filler <- palette
@@ -147,15 +149,19 @@ gt_fa_column <- function(gt_object, column, ..., palette = NULL,
 
       # pass arguments into anonymous function
       lapply(X = x, FUN = function(xy) {
-        if (xy %in% c("", "NA", NA)) {
+        if (xy %in% c("", "NA", NA, NULL, "NULL")) {
           return(gt::html("&nbsp;"))
         }
 
         # drop missing levels
-        x <- x[!(x %in% c("", "NA", NA))]
+        x <- x[!(x %in% c("", "NA", NA, NULL, "NULL"))]
 
         fct_lvl <- unique(x)
-        stopifnot("The length of the unique elements must match the palette length" = length(fct_lvl) == length(pal_filler))
+        # TODO revisit if a useful check, since I'm dropping missing vals
+        # stopifnot(
+        #   "The length of the unique elements must match the palette length" =
+        #     length(fct_lvl) == length(as.vector(na.omit(pal_filler)))
+        #   )
 
         if (!is.null(names(pal_filler))) {
           fct_x <- factor(xy, levels = names(pal_filler), labels = pal_filler) %>%
@@ -269,7 +275,7 @@ gt_fa_rating <- function(gt_object, column, max_rating = 5, ...,
 #' @param gt_object An existing `gt` table object
 #' @param column The single column that you would like to convert to rank change indicators.
 #' @param palette A character vector of length 3. Colors can be represented as hex values or named colors. Colors should be in the order of up-arrow, no-change, down-arrow, defaults to green, grey, purple.
-#' @param fa_type The name of the Fontawesome icon, limited to 6 types of various arrows.
+#' @param fa_type The name of the Fontawesome icon, limited to 5 types of various arrows, one of `c("angles", "arrow", "turn", "chevron", "caret")`
 #' @param font_color A string, indicating the color of the font, can also be returned as `'match'` to match the font color to the arrow palette.
 #' @param show_text A logical indicating whether to show/hide the values in the column.
 #' @return a `gt` table
@@ -285,9 +291,14 @@ gt_fa_rating <- function(gt_object, column, max_rating = 5, ...,
 #' \if{html}{\figure{fa_rank_change.png}{options: width=5\%}}
 #'
 #' @family Utilities
-gt_fa_rank_change <- function(gt_object, column, palette = c("#1b7837", "lightgrey", "#762a83"),
-                              fa_type = c("angles", "arrow", "turn", "chevron", "caret"),
-                              font_color = "black", show_text = TRUE) {
+gt_fa_rank_change <- function(
+    gt_object,
+    column,
+    palette = c("#1b7837", "lightgrey", "#762a83"),
+    fa_type = c("angles", "arrow", "turn", "chevron", "caret"),
+    font_color = "black",
+    show_text = TRUE) {
+
   vals <- gt_index(gt_object, {{ column }})
 
   stopifnot("Column must be integers" = is.integer(as.integer(vals)))
@@ -304,7 +315,7 @@ gt_fa_rank_change <- function(gt_object, column, palette = c("#1b7837", "lightgr
       font_color <- color
     }
 
-    if (is_blank(text)) {
+    if (is_blank(text) || is_blank(fa_name)) {
       return(gt::html("<bold style='color:#d3d3d3;'>--</bold>"))
     } else if (!nzchar(text) & !is_blank(text)) {
       fa_height <- "20px"
@@ -335,6 +346,7 @@ gt_fa_rank_change <- function(gt_object, column, palette = c("#1b7837", "lightgr
     text_transform(
       locations = cells_body({{ column }}),
       fn = function(x) {
+
         vals <- gt_index(gt_object, {{ column }})
 
         color_vals <- dplyr::case_when(

@@ -1,3 +1,20 @@
+# gtExtras (development version)
+
+# gtExtras 0.5.0
+
+- Refactor NA handling in `gt_fa_` functions - thanks to @areckenrode via [#78](https://github.com/jthomasmock/gtExtras/issues/78)
+- Allow for all negative values in `gt_plt_bar()` - thanks to @paspvik via [#75](https://github.com/jthomasmock/gtExtras/pull/75)
+- Respect max and negative range of target and column values in `gt_plt_bullet()` - thanks to @zdenall via [#79](https://github.com/jthomasmock/gtExtras/issues/79)
+- Improve `gt_theme_538()` to better align with FiveThirtyEight style, namely improved font choices ("Cairo")
+- Address NAs properly in `gt_fa_rank_change()` - thanks to @moodymudskipper via [#80](https://github.com/jthomasmock/gtExtras/issues/80)
+- Refactor `fmt_symbol_first()` to work correctly with any font, not just monospace fonts.
+- Add an experimental `gt_render_reprex()` thanks to @mrcaseb suggestion on [Twitter](https://twitter.com/mrcaseb/status/1628122417523527697?s=20)
+- Allow for entire NA columns in `gt_plt_bar()` and `gt_plt_bar_pct()` - [#86](https://github.com/jthomasmock/gtExtras/issues/86)
+- Accommodate small values in `gt_plt_bullet()` - [#87](https://github.com/jthomasmock/gtExtras/issues/87)
+- Address some small bugs #94 and #95
+- Add an expandable tag to `gt_plt_summary()` - [Request](https://twitter.com/AdriMichelson/status/1697020677952557103?s=20)
+- Add a labelling feature to `gt_plt_bar_pct()` - thanks to @andreweatherman and [PR](https://github.com/jthomasmock/gtExtras/pull/100)
+
 # gtExtras 0.4.5
 - Refactor many functions to account for upstream changes in `gt` v0.8.0
 - Add a `palette_col` argument to `gt_plt_bullet()` to accept a named column of palette colors as present in the data. Fixed #72
@@ -67,7 +84,7 @@
 # gtExtras 0.3.4
 
 - Add initial version of a `gt_plt_summary()` function, as inspired by the [Observable/SummaryTable function](https://observablehq.com/@observablehq/summary-table).
-- `gt_sparkline()` will be removed soon now that [`bstfun`/`gtsummary`](https://github.com/ddsjoberg/bstfun/pull/102) are no longer depending on it. `gt_plt_dist()` and `gt_plt_sparkline()` will be the new preferred and enhanced versions of `gt_sparkline()`.
+- `gt_sparkline()` will be removed soon now that `bstfun`/`gtsummary` are no longer depending on it. `gt_plt_dist()` and `gt_plt_sparkline()` will be the new preferred and enhanced versions of `gt_sparkline()`.
 - Add tests for `gt_plt_summary()`
 
 # gtExtras 0.3.3
