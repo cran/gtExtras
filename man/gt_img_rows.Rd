@@ -13,7 +13,12 @@ gt_img_rows(gt_object, columns, img_source = "web", height = 30)
 
 \item{img_source}{A string, specifying either "local" or "web" as the source of the images.}
 
-\item{height}{The absolute height (px) of the image in the table cell.}
+\item{height}{\emph{Height of image}
+
+\verb{scalar<numeric|integer>} // \emph{default:} \code{30}
+
+The absolute height of the image in the table cell (in \code{"px"} units). By
+default, this is set to \code{"30px"}.}
 }
 \value{
 An object of class \code{gt_tbl}.
@@ -63,18 +68,16 @@ Other Utilities:
 \code{\link{gt_badge}()},
 \code{\link{gt_double_table}()},
 \code{\link{gt_duplicate_column}()},
-\code{\link{gt_fa_column}()},
 \code{\link{gt_fa_rank_change}()},
 \code{\link{gt_fa_rating}()},
-\code{\link{gt_fa_repeats}()},
 \code{\link{gt_highlight_cols}()},
 \code{\link{gt_highlight_rows}()},
 \code{\link{gt_img_border}()},
 \code{\link{gt_img_circle}()},
 \code{\link{gt_img_multi_rows}()},
 \code{\link{gt_index}()},
-\code{\link{gt_merge_stack_color}()},
 \code{\link{gt_merge_stack}()},
+\code{\link{gt_merge_stack_color}()},
 \code{\link{gt_two_column_layout}()},
 \code{\link{gtsave_extra}()},
 \code{\link{img_header}()},

@@ -14,6 +14,7 @@
 #' @param bw The bandwidth or binwidth, passed to `density()` or `ggplot2::geom_histogram()`. If `type = "density"`, then `bw` is passed to the `bw` argument, if `type = "histogram"`, then `bw` is passed to the `binwidth` argument.
 #' @param trim A logical indicating whether to trim the values in `type = "density"` to a slight expansion beyond the observable range. Can help with long tails in `density` plots.
 #' @param same_limit A logical indicating that the plots will use the same axis range (`TRUE`) or have individual axis ranges (`FALSE`).
+#' @param type_col A tidyselect column indicating a vector of which `type` of plot to make by row. Must be equal to the total number of rows and limited to `"boxplot"`, `"histogram"`, `"rug_strip"` or `"density"`.
 #' @return An object of class `gt_tbl`.
 #' @export
 #' @section Examples:
@@ -41,7 +42,9 @@ gt_plt_dist <- function(gt_object,
                         fill_color = "grey",
                         bw = NULL,
                         trim = FALSE,
-                        same_limit = TRUE) {
+                        same_limit = TRUE,
+                        type_col = NULL
+                        ) {
   is_gt_stop(gt_object)
   # convert tidyeval column to bare string
   col_bare <- dplyr::select(gt_object[["_data"]], {{ column }}) %>% names()
@@ -59,7 +62,10 @@ gt_plt_dist <- function(gt_object,
   # range to be used for plotting if same axis
   total_rng <- grDevices::extendrange(data_in, r = range(data_in, na.rm = TRUE), f = 0.02)
 
-  plot_fn_spark <- function(trim, list_data_in) {
+  # TODO: Need to account for bw as well.
+
+  plot_fn_spark <- function(trim, list_data_in, type_in) {
+
     if (all(list_data_in %in% c(NA, NULL))) {
       return("<div></div>")
     }
@@ -76,6 +82,9 @@ gt_plt_dist <- function(gt_object,
       x = 1:length(vals),
       y = vals
     )
+
+    # respect type column or value
+    type = type_in
 
     if (type == "boxplot") {
       plot_base <- ggplot(input_data) +
@@ -150,20 +159,40 @@ gt_plt_dist <- function(gt_object,
 
       if (isTRUE(same_limit)) {
         if (is.null(bw)) {
-          bw <- 2 * stats::IQR(data_in, na.rm = TRUE) / length(data_in)^(1 / 3)
+          bw <- bw_calc(data_in)
+
         } else {
           bw <- bw
         }
 
         plot_out <- plot_base +
-          geom_histogram(
-            aes(x = .data$y),
-            color = line_color,
-            fill = fill_color,
-            binwidth = bw,
-            linewidth = 0.2
-          ) +
-          scale_x_continuous(expand = expansion(mult = 0.2)) +
+          {
+            if(bw > 0){
+              geom_histogram(
+                aes(x = .data$y), 
+                color = line_color, fill = fill_color, binwidth = bw,
+                linewidth = 0.2
+              )
+            } else if(bw == 0) {
+              bw <- 1
+
+              geom_histogram(
+                aes(x = .data$y), 
+                color = line_color, fill = fill_color, binwidth = bw,
+                linewidth = 0.2
+              )
+            } else {
+    
+              hist_breaks <- graphics::hist(data_in[!is.na(data_in)], breaks = "FD", plot=FALSE)$breaks
+    
+              geom_histogram(
+                aes(x = .data$y), 
+                color = line_color, fill = fill_color, breaks = hist_breaks,
+                linewidth = 0.2
+              )
+            }
+          } +
+          scale_x_continuous(expand = expansion(mult = 0.1)) +
           coord_cartesian(
             clip = "off",
             xlim = grDevices::extendrange(
@@ -252,7 +281,7 @@ gt_plt_dist <- function(gt_object,
           bw <- bw
         }
 
-        total_rng_dens <- stats::density(data_in, bw = bw)[["x"]]
+        total_rng_dens <- stats::density(stats::na.omit(as.vector(vals)), bw = bw)[["x"]]
 
         density_calc <- stats::density(input_data[["y"]], bw = bw)
         density_range <- density_calc[["x"]]
@@ -314,11 +343,20 @@ gt_plt_dist <- function(gt_object,
     img_plot
   }
 
+  if(!rlang::quo_is_null(rlang::enquo(type_col))){
+
+    type_vec <- gt_index(gt_object, {{ type_col }}, as_vector = TRUE)
+    type <- type_vec
+
+    stopifnot("You must indicate the `type` of plot as one of 'boxplot', 'histogram', 'rug_strip' or 'density'." = isTRUE(all(type %in% c("boxplot", "rug_strip", "histogram", "density"))))
+
+  }
+
   text_transform(
     gt_object,
     locations = cells_body(columns = {{ column }}),
     fn = function(x) {
-      mapply(plot_fn_spark, trim, list_data_in, SIMPLIFY = FALSE)
+      mapply(plot_fn_spark, trim, list_data_in, type, SIMPLIFY = FALSE)
     }
   )
 }
